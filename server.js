@@ -7,9 +7,11 @@ const dponfig=require('./config/dbConfig');
 const usersRouter=require('./routes/userRoutes');
 const examRouter=require('./routes/examRouter');
 const reportRouter=require('./routes/reportRouter');
+const cheatingRouter=require('./routes/cheatingRouter');
 app.use("/api/users",usersRouter);
 app.use("/api/exams",examRouter);
 app.use("/api/reports",reportRouter);
+app.use("/api/cheating",cheatingRouter);
 app.listen(port,()=>{ 
     console.log(`its running on port ${port}`);   
 });

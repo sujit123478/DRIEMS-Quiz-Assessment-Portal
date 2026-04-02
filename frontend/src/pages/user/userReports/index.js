@@ -4,10 +4,8 @@ import {useDispatch,useSelector} from 'react-redux';
 import PageTitles from '../../../component/PageTitles';
 import { HideLoading, ShowLoading } from '../../../redux/loaderSlice';
 import { getAllReportsByUser } from '../../../apiCalls/reports';
-import { getUserInfo } from '../../../apiCalls/user';
 import { useNavigate } from 'react-router-dom';
-import { setUser } from '../../../redux/userSlice';
-
+import { useNavigationMenu } from '../../../hooks/useNavigationMenu';
 
 import moment from 'moment';
 function UserReports({children}) {
@@ -17,119 +15,24 @@ function UserReports({children}) {
     const [menu,setMenu] = useState([]);
     const [collapsed,setCollapsed] = useState();
     const navigate=useNavigate();
-    const userManu =[
-        {
-          title:"Home",
-          path:['/','/user/write-exam'],
-          icon:<i className="ri-home-line"></i>,
-          onClick:() => navigate("/")
-        },
-        {
-          title:"Reports",
-          path:['/user/reports'],
-          icon:<i className="ri-bar-chart-line"></i>,
-          onClick:()=> navigate("/user/reports")
-        },
-        {
-          title:"Profile",
-          path:["/profile"],
-          icon:<i className="ri-user-line"></i>,
-          onClick:()=>navigate("/profile")
-        },
-        {
-          title:"Logout",
-          path:["/logout"],
-          icon:<i className="ri-logout-circle-line"></i>,
-          onClick:()=>{
-            localStorage.removeItem("token");
-            navigate("/login");
-          }
-        }
-      ];
-      
-      const adminMenu = [
-        {
-          title:"Home",
-          path:['/' ,'/user/write-exam'],
-          icon:<i className="ri-home-line"></i>,
-          onClick:() => navigate("/")
-        },
-        {
-          title:"Exam",
-          path:['/admin/exams', '/admin/exams/add'],
-          icon:<i className="ri-file-list-line"></i>,
-          onClick:()=> navigate("/admin/exams")
-        },
-        {
-          title:"Reports",
-          path:['/admin/reports'],
-          icon:<i className="ri-bar-chart-line"></i>,
-          onClick:()=> navigate("/admin/reports")
-        },
-        {
-          title:"Profile",
-          path:["/profile"],
-          icon:<i className="ri-user-line"></i>,
-          onClick:()=>navigate("/profile")
-        },
-        {
-          title:"Logout",
-          path:["/logout"],
-          icon:<i className="ri-logout-circle-line"></i>,
-          onClick:()=>{
-            localStorage.removeItem("token");
-            navigate("/login");
-          }
-        }
-      ];
-      const getUserData =async () =>{
-        try {
-          dispatch(ShowLoading());
-          const response= await getUserInfo();
-          dispatch(HideLoading());
-          if(response.success){
-            message.success(response.message);
-            dispatch(setUser(response.data));
-            if(response.data.isAdmin){
-              setMenu(adminMenu);
-            }else{
-              setMenu(userManu);
-            }
-          }
-          else {
-            navigate("/login");
-          }
-        } catch (error) {
-          navigate('/login');
-          dispatch(HideLoading());
-          message.error(error.message);
-        }
+    const { userMenu, adminMenu, getUserData, getIsActiveOrNot } = useNavigationMenu();
+
+    useEffect(()=>{
+      if(localStorage.getItem("token")){
+            getUserData().then(userData => {
+              if(userData?.isAdmin){
+                setMenu(adminMenu);
+              }else{
+                setMenu(userMenu);
+              }
+            });
+      }else{
+        navigate('/login');
       }
-        useEffect(()=>{
-          if(localStorage.getItem("token")){
-                getUserData();
-          }else{
-            navigate('/login');
-          }
-        }
-        ,
-        []
-        );
-        const activeRoute =window.location.pathname;
-      
-        const getIsActiveOrNot = (paths) => { 
-            if (paths.includes(activeRoute)) {
-              return true;
-            }else{
-              if(activeRoute.includes('/admin/exams/edit')&& paths.includes('/admin/exams')){
-                return true;
-              }
-              if(activeRoute.includes('/user/write-exam') && paths.includes('/user/write-exam')){
-                return true;
-              }
-              return false;
-            }
-        }
+    }
+    ,
+    []
+    );
 
 
         const getData= async() =>{
@@ -221,57 +124,108 @@ function UserReports({children}) {
     },
     [])
   return (
-    <div>
-    <div className='layout'>
-      <div className='flex gap-2'>
-        <div className='body'>
-          <div className='header flex justify-between'>
-            {!collapsed && <i  className="ri-menu-line" onClick={() => {
-              setCollapsed(true);
-            }}></i>}
-            {collapsed && <i  className="ri-close-line" onClick={() => {
-              setCollapsed(false)
-            }
-            }
-            ></i>}
-            <h1 className='text-2xl'>Driems polytechnic Quiz app</h1>
-            <div className='flex flex-col'>
-              <div className='flex gap-1 item-center '>
-                <i className="ri-user-line"></i>
-                <h1 className='text-xl'>{user?.name}</h1>
+    user && (
+      <div className="modern-layout">
+        <div className="layout">
+          <div className="flex gap-2">
+            <div className="body">
+              {/* Modern Header */}
+              <div className="modern-header">
+                <div className="header-content">
+                  <div className="menu-toggle">
+                    {!collapsed && (
+                      <i
+                        className="ri-menu-line toggle-icon"
+                        onClick={() => setCollapsed(true)}
+                      ></i>
+                    )}
+                    {collapsed && (
+                      <i
+                        className="ri-close-line toggle-icon"
+                        onClick={() => setCollapsed(false)}
+                      ></i>
+                    )}
+                  </div>
+
+                  <div className="header-center">
+                    <h1 className="portal-title">
+                      <i className="ri-graduation-cap-line"></i>
+                      DRIEMS Quiz Assessment Portal
+                    </h1>
+                  </div>
+
+                  <div className="user-profile">
+                    <div className="user-avatar">
+                      <i className="ri-user-line"></i>
+                    </div>
+                    <div className="user-info">
+                      <h3>{user?.name}</h3>
+                      <span className="user-role">
+                        {user?.isAdmin ? "Administrator" : "Student"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <span>Role : {user?.isAdmin ? "Admin" : "User"}</span>
+              <div className="flex">
+                {/* Modern Sidebar */}
+                {collapsed && (
+                  <div className="modern-sidebar">
+                    <div className="sidebar-header">
+                      <div className="sidebar-header-content">
+                        <h3>Navigation</h3>
+                        {/* Close button for mobile */}
+                        <div className="sidebar-close-mobile">
+                          <i
+                            className="ri-close-line toggle-icon"
+                            onClick={() => setCollapsed(false)}
+                          ></i>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="menu-list">
+                      {menu.map((item, index) => (
+                        <div
+                          className={`modern-menu-item ${
+                            getIsActiveOrNot(item.path) && "active-menu-item"
+                          }`}
+                          key={index}
+                          onClick={item.onClick}
+                        >
+                          <span className="menu-icon">{item.icon}</span>
+                          <span className="menu-text">{item.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Main Content Area */}
+                <div
+                  className={`main-content ${
+                    collapsed ? `content-collapsed` : ``
+                  }`}
+                >
+                  <div className="user-reports-section">
+                    <PageTitles title="Reports" />
+                    <div className="divider mt-2"></div>
+                    <div className="reports">
+                      <Table
+                        columns={columns}
+                        dataSource={reportsData}
+                        pagination={{ pageSize: 6 }}
+                        className="modern-table"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-
           </div>
-          <div className='content'>{children}</div>
         </div>
       </div>
-
-      <div className='flex'>
-        {collapsed && <div className='sidebar' >
-          {
-            menu.map((item, index) => {
-              return <div className={`menu-item ${getIsActiveOrNot(item.path) && "active-menu-item"}`}
-                key={index} onClick={item.onClick}
-              >
-                {item.icon}
-                {<span className=''>{item.title}</span>}
-              </div>
-            })
-          }
-        </div>}
-        <div className={`reportContainer ${collapsed ? `homeHide` : ``}`}>
-        <div className='mt-2 p-1'>
-        <PageTitles title="Reports"/>
-        <hr/>
-        <Table columns={columns} dataSource={reportsData} pagination={{ pageSize:6 }}></Table>
-    </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  )
+    )
+  );
 }
 
 export default UserReports;

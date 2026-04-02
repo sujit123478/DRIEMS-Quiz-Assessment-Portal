@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, message } from 'antd';
-import driemsIMage from "../../../assets/driems.png";
+import driemsIMage from "../../../assets/driems.jpg";
 import { changePassword, sendOtp } from '../../../apiCalls/user';
 import {useDispatch} from 'react-redux';
 import { HideLoading, ShowLoading } from '../../../redux/loaderSlice';
@@ -94,7 +94,13 @@ function ForgetPassword() {
                 <div className='card p-3 bg-white forget-card w-400 fixed-position'>
                     <div className='flex flex-col'>
                         <div className='flex item-center justify-center'>
-                            <img src={driemsIMage} alt='Driems Logo' width='150px' height='150px' />
+                             <img
+                                          src={driemsIMage}
+                                          alt="Driems Logo"
+                                          width="130px"
+                                          height="150px"
+                                          style={{borderRadius: "10px"}}
+                                        />
                         </div>
                         <h1>{verifiedOTP ? 'Change Password' : submittedEmail ? 'Verify OTP' : 'Forget Password'}</h1>
                         <div className='divider mt-1'></div>
@@ -126,7 +132,7 @@ function ForgetPassword() {
                                 <button type='submit' className={`primary-contend-btn mt-2 w-100 w-20p`}>
                                     {verifiedOTP ? 'Change Password' : submittedEmail ? 'Verify OTP' : 'Send OTP'}
                                 </button>
-                                <Link to='/register' className='c-white'>Not a member? Register</Link>
+                                <Link to='/register' className='cl-black '>Not a member? Register</Link>
                             </div>
                         </Form>
                     </div>

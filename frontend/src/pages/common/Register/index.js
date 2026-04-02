@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, message } from 'antd';
 import { registerUser } from '../../../apiCalls/user';
 import { useDispatch } from 'react-redux';
 import { HideLoading, ShowLoading } from '../../../redux/loaderSlice';
-import driemsIMage from "../../../assets/driems.png";
+import driemsIMage from "../../../assets/driems.jpg";
+
 function Register() {
-  const dispatch =useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const onFinish =async(values) => {
+
+  const onFinish = useCallback(async (values) => {
    try {
        dispatch(ShowLoading());
        const response = await registerUser(values);
@@ -23,13 +25,20 @@ function Register() {
     dispatch(HideLoading());
     message.error(error);
    }
-  };
+  }, [dispatch, navigate]);
+
   return (
     <div className='h-screen flex item-center justify-center bg-primary fixed-position w-100 '>
     <div className='card w-400 p-3 bg-white register-card fixed-position'>
     <div className='flex flex-col'>
     <div className='flex item-center justify-center'>
-    <img src={driemsIMage} alt='Driems Logo' width='150px' height="150px" className='logo'/>
+    <img
+                 src={driemsIMage}
+                 alt="Driems Logo"
+                 width="130px"
+                 height="150px"
+                 style={{borderRadius: "10px"}}
+               />
     </div>
     <h1>Register Form</h1>
       <div className='divider mt-1'></div>
@@ -48,7 +57,7 @@ function Register() {
           </Form.Item>
           <div className='flex flex-col gap-1'>
           <button type='submit' className='primary-contend-btn  w-100'>Register</button>
-          <Link to="/login" className='c-white'>Already a member ? Login</Link>
+          <Link to="/login" className='cl-black'>Already a member ? Login</Link>
           </div>
       </Form>
     </div>
@@ -57,4 +66,4 @@ function Register() {
   )
 }
 
-export default Register;
+export default React.memo(Register);

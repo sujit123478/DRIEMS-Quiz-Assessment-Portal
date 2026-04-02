@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 
-function Instruction({examData , view,setView, startTimer}) {
+function Instruction({examData , view,setView, startExam}) {
   const navigate = useNavigate();
   return (
   
@@ -30,8 +30,7 @@ function Instruction({examData , view,setView, startTimer}) {
           Close
         </button>
       <button className='primary-contend-btn' onClick={()=>{
-        startTimer();
-        setView('questions');
+        startExam();
       }} >Start Exam</button>
       </div>
     </div>
